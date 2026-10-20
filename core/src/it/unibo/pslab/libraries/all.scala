@@ -1,5 +1,6 @@
 package it.unibo.pslab.libraries
 
 object all:
-  export SyncLibrary.*
   export Syntax.*
+  export SyncLibrary.*
+  export RMI.*

@@ -101,3 +101,5 @@ object SyncLibrary:
         take(task) >>= compute
       collectedResults <- coAnisotropicComm[To, From](partialResult)
     yield collectedResults
+
+  // TODO: add reduce
