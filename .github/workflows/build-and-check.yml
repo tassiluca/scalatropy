@@ -36,7 +36,7 @@ jobs:
         run: ./mill __.fix --check && ./mill mill.scalalib.scalafmt/checkFormatAll
 
   evaluation:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: build
     steps:
       - *checkout-repo
@@ -44,7 +44,7 @@ jobs:
         run: docker compose up --exit-code-from evaluation evaluation
 
   success:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs:
       - build
       - evaluation
