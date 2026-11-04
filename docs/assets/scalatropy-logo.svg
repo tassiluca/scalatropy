@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 112" role="img" aria-labelledby="title description">
+  <title id="title">ScalaTropy</title>
+  <desc id="description">A network of connected peers with individually styled links suggesting different communication protocols, alongside the ScalaTropy wordmark.</desc>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4">
+    <path d="M26 56 48 30" stroke="#315a5b" />
+    <path d="M48 30 51 57" stroke="#e56b4b" stroke-dasharray="7 4" />
+    <path d="M48 30 73 45" stroke="#b47b25" stroke-dasharray="1 5" stroke-width="5" />
+    <path d="M73 45 95 27" stroke="#5b9b91" stroke-dasharray="9 3 2 3" />
+    <path d="M26 56 51 83" stroke="#596e8a" stroke-dasharray="4 2" stroke-width="3" />
+    <path d="M51 83 51 57" stroke="#d47647" stroke-dasharray="12 4" />
+    <path d="M51 83 73 67" stroke="#5b9b91" stroke-dasharray="2 3" stroke-width="5" />
+    <path d="M73 67 95 84" stroke="#9a5c62" stroke-dasharray="7 2 2 2" />
+    <path d="M26 56 51 57" stroke="#536b7a" stroke-dasharray="1 3 5 3" />
+    <path d="M51 57 73 45" stroke="#9b7928" stroke-dasharray="5 2 1 2" />
+  </g>
+  <circle cx="26" cy="56" r="8" fill="#e56b4b" />
+  <circle cx="48" cy="30" r="8" fill="#e6aa45" />
+  <circle cx="51" cy="57" r="9" fill="#315a5b" />
+  <circle cx="51" cy="83" r="8" fill="#5b9b91" />
+  <circle cx="73" cy="45" r="8" fill="#5b9b91" />
+  <circle cx="73" cy="67" r="8" fill="#e56b4b" />
+  <circle cx="95" cy="27" r="8" fill="#e6aa45" />
+  <circle cx="95" cy="84" r="8" fill="#315a5b" />
+  <text x="130" y="76" fill="#203c3d" font-family="Avenir Next, Segoe UI, sans-serif" font-size="58" font-weight="650">ScalaTropy</text>
+</svg>

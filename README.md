@@ -1,54 +1,50 @@
-# ScalaTropy
+<h1 align="center"><img src="docs/assets/scalatropy-logo.svg" alt="ScalaTropy" width="480" /></h1>
+<p align="center"><strong>Typed multiparty programming in Scala.</strong></p>
 
-## Overview
+ScalaTropy is a Scala library for describing distributed applications as multiparty programs. Define the choreography once, project it onto typed peers, and run those peers over configured network connections.
 
-Examples are provided in the `examples/` directory and use an MQTT-based network to demonstrate our language distributed capabilities.
+## What it provides
 
-- `PingPong`: a simple Ping-Pong example between two parties incrementing a counter for each message exchange;
-- `TrianglePingPong`: a Ping-Pong example between three parties, where each party sends a message to the next one in a ring topology;
-- `MasterWorker`: a Master-Worker application example where a master node distributes tasks to multiple worker nodes, waiting for their partial results to aggregate them into a final result.
-- `matmul/*MatMulMasterWorker`: the Master-Worker example applied to the matrix multiplication problem. This example is provided in two versions, one using a broadcasting communication strategy and one using a selective communication strategy.
-- `kvs/*KeyValueStore`: a replicated Key-Value store with a primary that processes client requests and replicates them to backups. The synchronous version waits for replication before replying; the asynchronous version replies immediately and replicates concurrently, illustrating parallel sub-choreographies.
+- A DSL for describing communication and coordination between typed peers.
+- Endpoint projection to execute a multiparty program as local peer behaviors.
+- Network abstractions with MQTT, WebSocket, and in-memory implementations.
+- Examples ranging from simple message exchanges to replicated services.
 
-## How to run
+## Project structure
 
-To run the examples, use the Docker Compose file provided in the root of the repository:
+- [`core/`](core/): the multiparty language, peer and deployment abstractions, and shared APIs.
+- [`distributed/`](distributed/): network implementations for running peers on distributed transports.
+- [`examples/`](examples/): runnable programs demonstrating ScalaTropy's features.
+
+## Quick start
+
+Start the local MQTT broker:
 
 ```bash
 docker compose up mosquitto
 ```
 
-This will expose an MQTT broker at `localhost` on port `1883`.
-
-You can then run the main methods provided in each example either by using your IDE or by following these steps:
+In another terminal, build the examples and run the PingPong program:
 
 ```bash
-# generate the JAR file for the example
 ./mill examples.assembly
-
-# run
-java -cp out/examples/assembly.dest/out.jar <MAIN_PROGRAM_FQN>
+java -cp out/examples/assembly.dest/out.jar it.unibo.pslab.PingPongApp
 ```
 
-you need to replace `<MAIN_PROGRAM_FQN>` with the fully qualified name of the main object of the example you want to run, e.g., `it.unibo.pslab.Pinger` or `it.unibo.pslab.kvs.PrimaryNode`.
+Replace `it.unibo.pslab.PingPongApp` with another launcher from the examples table to run a different program. The examples use the broker at `localhost:1883`.
 
-> [!NOTE]
-> Once started, each node will wait some seconds (by default, 7 seconds) to allow the discovery of all the other parties. Once the discovery phase is completed, the execution of the choreography will start and you will see the output of each node in the console.
-
-You can configure the initial waiting window by adjusting it like below:
+MQTT peers wait for discovery before starting the choreography. The default initial wait window is 5 seconds; configure it when creating the network if your deployment needs more time:
 
 ```scala
 val mqttConfig = Configuration(appId = "my-app-id", initialWaitWindow = 15.seconds)
 ```
 
-## Evaluation experiments reproduction
+## Evaluation
 
-The Message Overhead Analysis is reproducible by running:
+Reproduce the message-overhead analysis for broadcast and selective communication with:
 
 ```bash
 docker compose up evaluation
 ```
 
-This will run the experiments for both the broadcasting and selective communication strategies, and will plot the results using the `plot_results.py` script, saving the resulting figure in the `evaluation/` directory together with the raw data.
-
-The whole experiments take approximately 3 minutes.
+The experiment runs take approximately 3 minutes. The resulting plot and raw data are saved in `evaluation/`.
