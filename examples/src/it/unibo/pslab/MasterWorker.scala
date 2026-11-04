@@ -2,6 +2,7 @@ package it.unibo.pslab
 
 import it.unibo.pslab.ScalaTropy.*
 import it.unibo.pslab.UpickleCodable.given
+import it.unibo.pslab.libraries.all.*
 import it.unibo.pslab.multiparty.MultiParty
 import it.unibo.pslab.multiparty.MultiParty.*
 import it.unibo.pslab.network.AnyProtocol
@@ -26,27 +27,39 @@ object MasterWorker:
 
   def masterWorkerProgram[F[_]: {MonadThrow, Console}](using MultiParty[F]): F[Unit] =
     for
-      tasks <- on[Master]:
-        for
-          peers <- reachablePeers[Worker]
-          allocation = peers.map(_ -> Task(scala.util.Random.nextInt(100))).toList.toMap
-          message <- anisotropicMessage[Master, Worker](allocation, Task(0))
-        yield message
-      taskOnWorker <- anisotropicComm[Master, Worker](tasks)
-      partialResult <- on[Worker]:
-        for
-          t <- take(taskOnWorker)
-          res <- t.compute.pure[F]
-          _ <- F.println(s"Worker received task with input ${t.x}, computed result: $res")
-        yield res
-      allResults <- coAnisotropicComm[Worker, Master](partialResult)
+      allResults <- scatterGather[Master, Worker](
+        allocator = _.map(_ -> Task(10)).toList.toMap.pure[F],
+        default = Task(0),
+      )(_.compute.pure[F])
       _ <- on[Master]:
-        for
-          resultsMap <- takeAll(allResults)
-          result = resultsMap.values.sum
-          _ <- F.println(s"Master collected results from workers: ${result}")
-        yield ()
+        takeAll(allResults) >>= (_.values.sum.pure[F]) >>= log("Master collected results from workers: ")
     yield ()
+
+  // Alternative version, using plain communication primitives
+  //
+  // def masterWorkerProgram[F[_]: {MonadThrow, Console}](using MultiParty[F]): F[Unit] =
+  //   for
+  //     tasks <- on[Master]:
+  //       for
+  //         peers <- reachablePeers[Worker]
+  //         allocation = peers.map(_ -> Task(10)).toList.toMap
+  //         message <- anisotropicMessage[Master, Worker](allocation, Task(0))
+  //       yield message
+  //     taskOnWorker <- anisotropicComm[Master, Worker](tasks)
+  //     partialResult <- on[Worker]:
+  //       for
+  //         t <- take(taskOnWorker)
+  //         res <- t.compute.pure[F]
+  //         _ <- F.println(s"Worker received task with input ${t.x}, computed result: $res")
+  //       yield res
+  //     allResults <- coAnisotropicComm[Worker, Master](partialResult)
+  //     _ <- on[Master]:
+  //       for
+  //         resultsMap <- takeAll(allResults)
+  //         result = resultsMap.values.sum
+  //         _ <- F.println(s"Master collected results from workers: ${result}")
+  //       yield ()
+  //   yield ()
 
 object MasterWorkerApp extends IOApp.Simple:
   override def run: IO[Unit] = List(MasterServer.run, Worker1.run, Worker2.run).parSequence_

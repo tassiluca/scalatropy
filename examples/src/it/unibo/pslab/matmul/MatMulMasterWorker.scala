@@ -3,6 +3,7 @@ package it.unibo.pslab.matmul
 import it.unibo.pslab.ScalaTropy
 import it.unibo.pslab.ScalaTropy.*
 import it.unibo.pslab.UpickleCodable.given
+import it.unibo.pslab.libraries.all.*
 import it.unibo.pslab.matmul.LinearAlgebra.*
 import it.unibo.pslab.multiparty.MultiParty
 import it.unibo.pslab.multiparty.MultiParty.*
@@ -17,6 +18,7 @@ import cats.data.NonEmptyList
 import cats.effect.{ ExitCode, IO, IOApp }
 import cats.effect.std.Console
 import cats.syntax.all.*
+import upickle.default
 import upickle.default.ReadWriter
 
 import MatMulMasterWorker.*
@@ -45,18 +47,14 @@ object MatMulMasterWorker:
       MultiParty[F],
   )(matrix: Matrix[Double] on Master, vector: Vec[Double] on Master): F[Unit] =
     for
-      tasks <- on[Master]:
-        for
-          m <- take(matrix)
-          v <- take(vector)
-          workers <- reachablePeers[Worker]
-          allocation <- allocate(m, v) to workers
-          message <- anisotropicMessage[Master, Worker](allocation, Task.nil)
-        yield message
-      taskOnWorker <- anisotropicComm[Master, Worker](tasks)
-      partialResult <- on[Worker]:
-        take(taskOnWorker).map(_.compute)
-      allResults <- coAnisotropicComm[Worker, Master](partialResult)
+      allResults <- scatterGather[Master, Worker](
+        default = Task.nil,
+        allocator = workers =>
+          for
+            (m, v) <- take2(matrix, vector)
+            allocation <- allocate(m, v) to workers
+          yield allocation,
+      )(_.compute.pure[F])
       _ <- on[Master]:
         for
           resultsMap <- takeAll(allResults)
