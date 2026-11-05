@@ -1,5 +1,7 @@
 package it.unibo.pslab
 
+import scala.concurrent.duration.{ DurationInt, FiniteDuration }
+
 import it.unibo.pslab.ScalaTropy
 import it.unibo.pslab.UpickleCodable.given
 import it.unibo.pslab.deployment.Deployment.tiedTo
@@ -24,17 +26,22 @@ object RMIPlayground:
   trait Powerable[F[_], P <: Peer]:
     extension (p: P)
       def on(lightValue: Double): F[Unit]
+      def dim(lightValue: Double, duration: FiniteDuration): F[Unit]
       def off(): F[Unit]
 
   given [F[_]: Console] => Powerable[F, Light] = new Powerable[F, Light]:
     extension (p: Light)
       override def off(): F[Unit] = F.println("Light off")
       override def on(lightValue: Double): F[Unit] = F.println(s"Light ${p.hashCode()} on with value $lightValue")
+      override def dim(lightValue: Double, duration: FiniteDuration): F[Unit] =
+        F.println(s"Light ${p.hashCode()} dim with value $lightValue for duration $duration")
 
   def app[F[_]: {MonadThrow, Console}](using MultiParty[F]): F[Unit] =
     for
       lightValue <- on[Server](42.0.pure[F])
       _ <- dispatch[Server, Light](_.on)(lightValue)
+      dimArgs <- on[Server]((42.0, 5.seconds).pure[F])
+      _ <- dispatch[Server, Light](_.dim)(dimArgs)
     yield ()
 
 import RMIPlayground.*
