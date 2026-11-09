@@ -23,3 +23,9 @@ type Codable[F[_]] = [Message] =>> CodableF[F, Message]
 object Codable:
   export Encodable.*
   export Decodable.*
+
+private[pslab] object CodableInstances:
+  import cats.Applicative
+  given [F[_]: Applicative]: CodableF[F, Unit] = new CodableF[F, Unit]:
+    override def encode(value: Unit): F[Array[Byte]] = F.pure(Array.emptyByteArray)
+    override def decode(bytes: Array[Byte]): F[Unit] = F.pure(())
