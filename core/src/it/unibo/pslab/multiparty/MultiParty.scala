@@ -7,19 +7,19 @@ import it.unibo.pslab.multiparty.MultiParty.on
 import it.unibo.pslab.network.{ Codable, Network }
 import it.unibo.pslab.peers.Peers.{ CommunicationProtocolCompliance, Peer, PeerTag, TiedWithMultiple, TiedWithSingle }
 
-import cats.{ Monad, MonadThrow }
+import cats.MonadThrow
 import cats.data.NonEmptyList
 import cats.syntax.all.*
 
 trait Label[+V] extends Erased
 
-trait MultiParty[F[_]: Monad]:
+trait MultiParty[F[_]]:
   type Remote[P <: Peer]
   type Anisotropic[P <: Peer, V]
 
   def reachablePeers[RP <: Peer](using PeerTag[RP])[L <: Peer: Label]: F[NonEmptyList[Remote[RP]]]
 
-  def on[Local <: Peer](using PeerTag[Local])[V](body: (Label[Local]) ?=> F[V]): F[V on Local]
+  def on[Local <: Peer](using PeerTag[Local])[V](body: => (Label[Local]) ?=> F[V]): F[V on Local]
 
   def take[Local <: Peer](using Label[Local])[V](placed: V on Local): F[V]
 
@@ -77,7 +77,7 @@ object MultiParty:
 
   def on[Local <: Peer](using
       PeerTag[Local],
-  )[F[_], V](body: Label[Local] ?=> F[V])(using lang: MultiParty[F]): F[V on Local] =
+  )[F[_], V](body: => (Label[Local]) ?=> F[V])(using lang: MultiParty[F]): F[V on Local] =
     lang.on[Local](body)
 
   def take[Local <: Peer](using Label[Local])[F[_], V](placed: V on Local)(using lang: MultiParty[F]): F[V] =
@@ -144,7 +144,7 @@ object MultiParty:
       def reachablePeers[RP <: Peer](using remote: PeerTag[RP])[L <: Peer: Label]: F[NonEmptyList[Remote[RP]]] =
         networkOf(remote) >>= (_.alivePeersOf[RP])
 
-      def on[Local <: Peer](using local: PeerTag[Local])[V](body: (Label[Local]) ?=> F[V]): F[V on Local] =
+      def on[Local <: Peer](using local: PeerTag[Local])[V](body: => (Label[Local]) ?=> F[V]): F[V on Local] =
         given Label[Local] = new Label[Local] {}
         val resourceF = env.provide(local)
         if runtimePeer <:< local then (resourceF, body).mapN(Placement.Local[V, Local].apply)
