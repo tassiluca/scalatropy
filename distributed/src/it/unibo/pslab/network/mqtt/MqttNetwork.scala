@@ -85,7 +85,7 @@ object MqttNetwork:
       _ <- network.publishPresenceUntilStart.background
       _ <- network.waitForStart.background
       _ <- Resource.eval(started.get)
-      _ <- Resource.eval(alivePeers.get.flatMap(peers => F.println(s"=== Joined peers: ${peers.mkString(",")} ===")))
+    // _ <- Resource.eval(alivePeers.get.flatMap(peers => F.println(s"=== Joined peers: ${peers.mkString(",")} ===")))
     yield network
 
   private class MqttNetworkImpl[
