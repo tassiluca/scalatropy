@@ -5,7 +5,7 @@ import it.unibo.pslab.UpickleCodable.given
 import it.unibo.pslab.libraries.all.*
 import it.unibo.pslab.multiparty.MultiParty
 import it.unibo.pslab.multiparty.MultiParty.*
-import it.unibo.pslab.network.AnyProtocol
+import it.unibo.pslab.network.`*`
 import it.unibo.pslab.network.mqtt.MqttNetwork
 import it.unibo.pslab.network.mqtt.MqttNetwork.Configuration
 import it.unibo.pslab.peers.Peers.*
@@ -19,8 +19,8 @@ import upickle.default.ReadWriter
 import MasterWorker.*
 
 object MasterWorker:
-  type Master <: { type Tie <: via[AnyProtocol toMultiple Worker] }
-  type Worker <: { type Tie <: via[AnyProtocol toSingle Master] }
+  type Master <: { type Tie <: via[* toMultiple Worker] }
+  type Worker <: { type Tie <: via[* toSingle Master] }
 
   case class Task(x: Int) derives ReadWriter:
     def compute: Int = x * x
@@ -62,7 +62,7 @@ object MasterWorker:
   //   yield ()
 
 object MasterWorkerApp extends IOApp.Simple:
-  override def run: IO[Unit] = List(MasterServer.run, Worker1.run, Worker2.run).parSequence_
+  override def run: IO[Unit] = (MasterServer.run :: List.fill(2)(Worker1.run)).parSequence_
 
 object MasterServer extends IOApp.Simple:
   override def run: IO[Unit] =
@@ -72,13 +72,6 @@ object MasterServer extends IOApp.Simple:
         tiedTo[Worker] via mqtt
 
 object Worker1 extends IOApp.Simple:
-  override def run: IO[Unit] =
-    val mqttNetwork = MqttNetwork.localBroker[IO, Worker](Configuration(appId = "masterworker"))
-    mqttNetwork.use: mqtt =>
-      ScalaTropy(masterWorkerProgram[IO]).projectedOn[Worker]:
-        tiedTo[Master] via mqtt
-
-object Worker2 extends IOApp.Simple:
   override def run: IO[Unit] =
     val mqttNetwork = MqttNetwork.localBroker[IO, Worker](Configuration(appId = "masterworker"))
     mqttNetwork.use: mqtt =>

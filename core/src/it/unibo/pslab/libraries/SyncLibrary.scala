@@ -77,6 +77,8 @@ object SyncLibrary:
    *   The default task to be used in case a peer is not allocated a specific task.
    * @param compute
    *   The effectful function that performs the computation on the allocated task and produces a partial result.
+   * @return
+   *   The effectful result of the computation, collected on the peer of type `From`.
    */
   def scatterGather[From <: TiedWithMultiple[To], To <: TiedWithSingle[From]](using
       PeerTag[From],

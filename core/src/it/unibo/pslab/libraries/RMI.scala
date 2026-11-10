@@ -33,7 +33,7 @@ object RMI:
     yield res
 
   /** Generalized version of [[it.unibo.pslab.libraries.RMI.dispatch]] for remote calls with multiple arguments. */
-  def dispatch[From <: TiedWithSingle[To], To <: TiedWithSingle[From]](using
+  def dispatchN[From <: TiedWithSingle[To], To <: TiedWithSingle[From]](using
       PeerTag[From],
       PeerTag[To],
       CommunicationProtocolCompliance[From, To],
@@ -89,17 +89,16 @@ object RMI:
    * Generalized version of [[it.unibo.pslab.libraries.RMI.dispatchMany]] supporting remote calls with multiple
    * arguments.
    */
-  def dispatchMany[From <: TiedWithMultiple[To], To <: TiedWithSingle[From]](using
+  def dispatchManyN[From <: TiedWithMultiple[To], To <: TiedWithSingle[From]](using
       PeerTag[From],
       PeerTag[To],
       CommunicationProtocolCompliance[From, To],
       CommunicationProtocolCompliance[To, From],
-  )[F[_]: MonadThrow, Fun, Args <: Tuple, Res: Codable[F]](
-      remoteCall: To => Fun,
-  )(args: Args on From)(using
+  )[F[_]: MonadThrow, Fun, Args <: Tuple, Res](remoteCall: To => Fun)(args: Args on From)(using
       party: MultiParty[F],
       tf: TupledFunction[Fun, Args => F[Res]],
       argsCodable: CodableF[F, Args],
+      resCodable: CodableF[F, Res],
   ): F[party.Anisotropic[To, Res] on From] =
     dispatchMany[From, To](peer => tf.tupled(remoteCall(peer)))(args)
 

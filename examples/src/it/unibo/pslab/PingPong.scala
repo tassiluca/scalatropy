@@ -7,7 +7,7 @@ import it.unibo.pslab.UpickleCodable.given
 import it.unibo.pslab.libraries.all.*
 import it.unibo.pslab.multiparty.MultiParty
 import it.unibo.pslab.multiparty.MultiParty.*
-import it.unibo.pslab.network.AnyProtocol
+import it.unibo.pslab.network.`*`
 import it.unibo.pslab.network.mqtt.MqttNetwork
 import it.unibo.pslab.network.mqtt.MqttNetwork.Configuration
 import it.unibo.pslab.peers.Peers.*
@@ -21,8 +21,8 @@ import cats.syntax.all.*
 import PingPong.*
 
 object PingPong:
-  type Pinger <: { type Tie <: via[AnyProtocol toSingle Ponger] }
-  type Ponger <: { type Tie <: via[AnyProtocol toSingle Pinger] }
+  type Pinger <: { type Tie <: via[* toSingle Ponger] }
+  type Ponger <: { type Tie <: via[* toSingle Pinger] }
 
   def pingPongProgram[F[_]: {Monad, Console, Temporal}](using MultiParty[F]): F[Unit] =
     def pingPong(value: Int on Pinger): F[Unit] =
