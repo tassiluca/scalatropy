@@ -11,7 +11,7 @@ import it.unibo.pslab.multiparty.MultiParty.on
 import it.unibo.pslab.network.`*`
 import it.unibo.pslab.network.mqtt.MqttNetwork
 import it.unibo.pslab.network.mqtt.MqttNetwork.Configuration
-import it.unibo.pslab.peers.Peers.{ toSingle, toMultiple, via, Peer }
+import it.unibo.pslab.peers.Peers.{ toMultiple, toSingle, via, Peer }
 
 import cats.MonadThrow
 import cats.effect.{ IO, IOApp }
