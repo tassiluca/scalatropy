@@ -1,6 +1,7 @@
 //| mvnDeps:
 //| - com.goyeau::mill-scalafix::0.6.0
 //| - com.github.lolgab::mill-crossplatform::0.3.0
+//| - com.adtechnacity::mill-githooks::1.2.0
 
 package build
 
@@ -11,6 +12,7 @@ import com.goyeau.mill.scalafix.ScalafixModule
 import mill.api.Task.Simple
 import mill.scalanativelib.ScalaNativeModule
 import mill.scalajslib.ScalaJSModule
+import atn.mill.*
 
 trait CommonScala extends ScalaModule with ScalafixModule {
   def scalaVersion = "3.9.0"
@@ -101,4 +103,15 @@ object distributed extends CommonJvm {
 
 object examples extends CommonJvm {
   def moduleDeps = Seq(distributed)
+}
+
+object git extends GitHooksModule {
+  override def defaultTask(): String = "install"
+
+  override def conventionalCommitTypes: List[String] =
+    "feat" :: "fix" :: "docs" :: "style" :: "refactor" :: "perf" :: "test" :: "chore" :: "build" :: Nil
+
+  override def preCommitExtraCommands: Seq[String] = Seq("./mill __.compile", "./mill __.fix --check")
+
+  override def prePushTasks: Seq[String] = Seq.empty
 }
