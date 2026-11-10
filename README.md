@@ -1,7 +1,17 @@
-<h1 align="center">ScalaTropy</h1>
-<p align="center"><strong>Typed multiparty programming in Scala.</strong></p>
+<div align="center">
+
+<h1>ScalaTropy</h1>
+<p><strong>Typed multiparty programming in Scala.</strong></p>
 
 ScalaTropy is a Scala library for describing distributed applications as multiparty programs. Define the choreography once, project it onto typed peers, and run those peers over configured network connections.
+
+[![Build and check](https://github.com/tassiluca/ScalaTropy/actions/workflows/ci.yml/badge.svg)](https://github.com/tassiluca/ScalaTropy/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/tassiluca/ScalaTropy)](https://github.com/tassiluca/ScalaTropy/releases)
+[![License](https://img.shields.io/github/license/tassiluca/ScalaTropy)](https://github.com/tassiluca/ScalaTropy/blob/master/LICENSE)
+[![Scala](https://img.shields.io/badge/Scala-3.9.0-red)](https://www.scala-lang.org/)
+[![GitHub stars](https://img.shields.io/github/stars/tassiluca/ScalaTropy)](https://github.com/tassiluca/ScalaTropy/stargazers)
+
+</div>
 
 ## What it provides
 
