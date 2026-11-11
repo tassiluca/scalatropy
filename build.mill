@@ -112,6 +112,4 @@ object git extends GitHooksModule {
     "feat" :: "fix" :: "docs" :: "style" :: "refactor" :: "perf" :: "test" :: "chore" :: "build" :: Nil
 
   override def preCommitExtraCommands: Seq[String] = Seq("./mill __.compile", "./mill __.fix --check")
-
-  override def prePushTasks: Seq[String] = Seq.empty
 }
