@@ -18,7 +18,7 @@ trait SmartGarden[F[_]: MonadThrow]:
     for
       humidities <- dispatchMany[Server, SoilMoistureSensor](_.measureHumidity)
       humitidyValues <- on[Server](takeAll(humidities) >>= (_.values.toSet.pure[F]))
-      _ <- dispatch[Server, Dashboard](_.presentHumidityMeasurements)(humitidyValues)
+      _ <- dispatch[Server, Dashboard](_.displayHumidity)(humitidyValues)
       mowingResult <- on[Server](shouldMow(humitidyValues))
       _ <- dispatch[Server, Dashboard](_.displayMowingResult)(mowingResult)
       skip <- on[Server](take(mowingResult).map(_.allSkipped))

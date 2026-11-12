@@ -45,7 +45,7 @@ trait MowerControl[F[_], P <: LawnMower]:
 
 trait UI[F[_], P <: Dashboard]:
   extension (p: P)
-    def presentHumidityMeasurements(measurements: Set[HumiditySample]): F[Unit]
+    def displayHumidity(measurements: Set[HumiditySample]): F[Unit]
     def displayMowingResult(result: MowingResult): F[Unit]
     def displayMowingEnded: F[Unit]
 
@@ -81,7 +81,7 @@ trait SmartGardenMockedPlatform[F[_]: {Monad as m, Console as console, Random as
 
     extension (p: Dashboard)
 
-      def presentHumidityMeasurements(measurements: Set[HumiditySample]): F[Unit] =
+      def displayHumidity(measurements: Set[HumiditySample]): F[Unit] =
         val rows = measurements.toList
           .sortBy(_.area.name)
           .map: m =>
